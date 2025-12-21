@@ -38,17 +38,21 @@ app.post('/sentiment', async (req, res) => {
         let sentiment = "neutral";
 
         // Task 5: set sentiment to negative or positive based on score rules
-        {{insert code here}}
+        if (analysisResult > 0 ) {
+            sentiment = "ositive";
+        } else if ( analysisResult < 0 ) {
+            sentiment = "negative";
+        }
 
         // Logging the result
         logger.info(`Sentiment analysis result: ${analysisResult}`);
 
         // Task 6: send a status code of 200 with both sentiment score and the sentiment txt in the format { sentimentScore: analysisResult, sentiment: sentiment }
-        {{insert code here}}
+        res.status(200).json({ sentimentScore: analysisResult, sentiment: sentiment });
     } catch (error) {
         logger.error(`Error performing sentiment analysis: ${error}`);
         // Task 7: if there is an error, return a HTTP code of 500 and the json {'message': 'Error performing sentiment analysis'}
-        {{insert code here}}
+        res.status(500).json({ sentimentScore: analysisResult, sentiment: sentiment })
     }
 });
 

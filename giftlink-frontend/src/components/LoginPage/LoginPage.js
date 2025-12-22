@@ -31,6 +31,18 @@ function LoginPage() {
                 />
             </div>
 
+            <div className='mb-4'>
+                <label htmlFor='password' className='form-label'>Password</label>
+                <input
+                    id='password'
+                    type='password'
+                    className='form-control'
+                    placeholder='Enter your password'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+            </div>
+
           {/* insert code here to create a button that performs the `handleLogin` function on click */}
             <button className='btn btn-primary w-100 mb-3' onClick={handleLogin}>Login</button>
 

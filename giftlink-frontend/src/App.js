@@ -8,7 +8,7 @@ import './App.css';
 import Navbar from './components/Navbar/Navbar';
 
 function App() {
-    cosnt navigate = useNavigate();
+    const navigate = useNavigate();
   return (
     <>
         <Navbar/>

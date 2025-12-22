@@ -65,7 +65,7 @@ function MainPage() {
                                 {gift.condition}
                                 </p>
 
-                                <p className:"card-text">{formatDate(gift.date_added)}</p>
+                                <p className="card-text">{formatDate(gift.date_added)}</p>
                                 
 
                                 <button onClick={() => goToDetailsPage(gift.id)} className="btn btn-primary">

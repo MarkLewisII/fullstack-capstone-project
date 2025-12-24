@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 
+import {urlConfig} from '../../config'; //Task 1: Import urlConfig from `giftlink-frontend/src/config.js`
+import { useAppContext } from '../../context/AuthContext'; //Task 2: Import useAppContext `giftlink-frontend/context/AuthContext.js`
+import { useNavigate } from 'react-router-dom'; //Task 3: Import useNavigate from `react-router-dom` to handle navigation after successful registration.
+
 import './RegisterPage.css';
 
 function RegisterPage() {
@@ -10,9 +14,38 @@ function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    // insert code here to create handleRegister function and include console.log
+    //Do these tasks inside the RegisterPage function, after the useStates definition
+    const [showerr, setShowerr] = useState(''); //Task 4: Include a state for error message.
+    const navigate = useNavigate(); //Task 5: Create a local variable for `navigate`   and `setIsLoggedIn`.
+    const {setIsLoggedIn } = useAppContext();
+
     const handleRegister = async () => {
-        console.log("Register invoked")
+        const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+            method: 'POST', //Task 6: Set method
+            headers: {
+                'content-type': 'application/json',
+            }, //Task 7: Set headers
+            body: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password
+            }) //Task 8: Set body to send user details
+        });
+
+        const json = await response.json();
+        if (json.authtoken) {
+            sessionStorage.setItem('auth-token', json.authtoken);
+            sessionStorage.setItem('name', firstName);
+            sessionStorage.setItem('email', json.email);
+
+            setIsLoggedIn(true);
+            navigate('/app');
+
+            if (json.error) {
+                setShowerr(json.error);
+            }
+        }
     }
 
          return (
@@ -71,7 +104,7 @@ function RegisterPage() {
                         />
                     </div>
 
-                    {/* insert code here to create a button that performs the `handleRegister` function on click */}
+                    <div className='text-danger'>{showerr}</div>
                     <button className="btn btn-primary w-100 mb-3" onClick={handleRegister}>Register</button>
                         <p className="mt-4 text-center">
                             Already a member? <a href="/app/login" className="text-primary">Login</a>

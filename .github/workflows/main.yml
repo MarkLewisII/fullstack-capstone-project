@@ -3,25 +3,25 @@ name: 'CI/CD'
 on: 
   push:
     branches: [master, main]
-  pull_requests:
+  pull_request:
     branches: [master, main]
 
-  jobs:
-    lint_js:
-      name: Lint JavaScript Files
-      runs-on: ubuntu-latest
+jobs:
+  lint_js:
+    name: Lint JavaScript Files
+    runs-on: ubuntu-latest
 
-      steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14
 
-      - name: Install JSHint
-        run: npm install jshint --global
+    - name: Install JSHint
+      run: npm install jshint --global
 
-      - name: Run Linter
-        run: |
+    - name: Run Linter
+      run: |

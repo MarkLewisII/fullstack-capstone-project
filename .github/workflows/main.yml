@@ -18,7 +18,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
 
       - name: Install JSHint
         run: npm install jshint --global
@@ -44,6 +44,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: giftlink-frontend
 
       - name: Run build
         run: |

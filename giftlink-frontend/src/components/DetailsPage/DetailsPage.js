@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './DetailsPage.css';
+import { urlConfig } from '../../config';
 
 function DetailsPage() {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ function DetailsPage() {
         const fetchGift = async () => {
             try {
 				// Task 2: Fetch gift details
-                const response = await fetch(`${urlCongig.backendUrl}/api/gifts/${productId}`);
+                const response = await fetch(`${urlConfig.backendUrl}/api/gifts/${productId}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

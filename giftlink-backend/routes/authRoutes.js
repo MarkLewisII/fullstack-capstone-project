@@ -8,6 +8,7 @@ const connectToDatabase = require('../models/db');
 const router = express.Router();
 const dotenv = require('dotenv');
 const pino = require('pino');  // Import Pino logger
+const { ReturnDocument } = require('mongodb');
 
 //Step 1 - Task 3: Create a Pino logger instance
 const logger = pino();  // Create a Pino logger instance
@@ -47,44 +48,90 @@ router.post('/register', async (req, res) => {
 
         const authtoken = jwt.sign(payload, JWT_SECRET); //Task 5: Create JWT authentication with user._id as payload
         logger.info('User registered successfully');
-        res.json({authtoken,email});
+        res.json({ authtoken, email });
     } catch (e) {
-         return res.status(500).send('Internal server error');
+        return res.status(500).send('Internal server error');
     }
 });
 
 router.post('/login', async (req, res) => {
-   try {
-    const db = await connectToDatabase();
-    const collection = db.collection("users");
-    const theUser = await collection.findOne({ email: req.body.email});
-    
-    if(theUser) {
-        let result = await bcryptjs.compare(req.body.password, theUser.password)
-        if (!result) {
-            logger.error('Passwords do not match');
-            return res.status(404).json({error: 'Wrong password'});
+    try {
+        const db = await connectToDatabase();
+        const collection = db.collection("users");
+        const theUser = await collection.findOne({ email: req.body.email });
+
+        if (theUser) {
+            let result = await bcryptjs.compare(req.body.password, theUser.password)
+            if (!result) {
+                logger.error('Passwords do not match');
+                return res.status(404).json({ error: 'Wrong password' });
+            }
+
+            const userName = theUser.firstName;
+            const userEmail = theUser.email;
+
+            let payload = {
+                user: {
+                    id: theUser._id.toString(),
+                },
+            };
+
+            jwt.sign(user._id, JWT_SECRET);
+        } else {
+            logger.error('User not found');
+            return res.status(404).json({ error: 'User not found' });
         }
 
-        const userName = theUser.firstName;
-        const userEmail = theUser.email;
+        res.json({ authtoken, userName, userEmail });
+    } catch (e) {
+        return res.status(500).send('Internal server error');
+    }
+});
 
-        let payload = {
+// {Insert it along with other imports} Task 1: Use the `body`,`validationResult` from `express-validator` for input validation
+
+router.put('/update', async (req, res) => {
+    // Task 2: Validate the input using `validationResult` and return approiate message if there is an error.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        logger.error("Validation errors in update request", errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        // Task 3: Check if `email` is present in the header and throw an appropriate error message if not present.
+        const email = req.headers.email;
+
+        if (!email) {
+            logger.error('Email not found in the request headers');
+            return res.status(404).json({ error: "Email not found in the request headers" });
+        }
+        // Task 4: Connect to MongoDB
+        const db = await connectToDatabase();
+        const collection = db.collection("users");
+        // Task 5: find user credentials in database
+        const existingUser = await collection.findOne({ email });
+
+        existingUser.updatedAt = new Date();
+
+        // Task 6: update user credentials in database
+        const updatedUser = await collection.findOneAndUpdate(
+            { email },
+            { $set: existingUser },
+            { ReturnDocument: 'after' }
+        );
+        // Task 7: create JWT authentication using secret key from .env file
+        const payload = {
             user: {
-                id: theUser._id.toString(),
+                id: updatedUser._id.toString(),
             },
         };
 
-        jwt.sign(user._id, JWT_SECRET);
-    } else {
-        logger.error('User not found');
-        return res.status(404).json({ error: 'User not found'});
-    }
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+        res.json({ authtoken });
+    } catch (e) {
+        return res.status(500).send('Internal server error');
 
-    res.json({authtoken, userName, userEmail});
-   } catch (e) {
-    return res.status(500).send('Internal server error');
-   } 
+    }
 });
 
 module.exports = router;
